@@ -9,7 +9,7 @@ setup(
     description='FishBot-Tool: a tool for FishBot',
     author='小鱼',
     url='https://fishros.com',
-    download_url='http://github.com/fishros.com/fishbot_tool',
+    download_url='http://github.com/fishros.com/fishros_can_debuger',
     author_email='fishros[at]foxmail[dot]com',
     version=__version__,
     license='LICENSE.txt',
@@ -32,7 +32,7 @@ setup(
         'console_scripts': [
         ]
     },
-    packages=['fishbot_tool'],
+    packages=['fishros_can_debuger'],
     package_data={},
     scripts=[],
     name='fishbot-tool',

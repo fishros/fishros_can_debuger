@@ -28,7 +28,7 @@ jobs:
           path: dist
 
       - name: Copy Bin For Docker
-        run: mkdir dist-for-docker && cp $(ls -1 dist/*) dist-for-docker/fishbot_tool_linux_amd64
+        run: mkdir dist-for-docker && cp $(ls -1 dist/*) dist-for-docker/fishros_can_debuger_linux_amd64
 
       - name: Archive build artifacts docker
         uses: actions/upload-artifact@v2

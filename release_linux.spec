@@ -54,7 +54,7 @@ exe = EXE(
     a.zipfiles,
     a.datas,
     [],
-    name=f'fishbot_tool.{version_name}.{get_platform_name()}',
+    name=f'fishros_can_debuger.{version_name}.{get_platform_name()}',
     debug=False,
     bootloader_ignore_signals=False,
     strip=False,

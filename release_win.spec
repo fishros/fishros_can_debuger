@@ -18,7 +18,7 @@ block_cipher = None
 
 a = Analysis(
     ['main.py'],
-    pathex=['/home/fishros/github/fishbot_tool/'],
+    pathex=['/home/fishros/github/fishros_can_debuger/'],
     binaries=[],
     datas=[('esptool\\esptool_win64.exe', 'esptool'),('stm32tool\\stm32flash_win64.exe', 'stm32tool'),('ui\\about.ui', 'ui'),('ui\\main.ui', 'ui'),('ui\\taobao.ui', 'ui'),('ui\\assert\\fishros.jpg', 'ui\\assert'),('ui\\assert\\taobao.jpeg', 'ui\\assert'),],
     hiddenimports=[],
@@ -41,7 +41,7 @@ exe = EXE(
     a.zipfiles,
     a.datas,
     [],
-    name=f'fishbot_tool.{version_name}.win.exe',
+    name=f'fishros_can_debuger.{version_name}.win.exe',
     debug=False,
     bootloader_ignore_signals=False,
     strip=False,
