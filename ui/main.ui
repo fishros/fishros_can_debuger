@@ -20,7 +20,7 @@
    </sizepolicy>
   </property>
   <property name="windowTitle">
-   <string>FishROS CAN Debugger(VCODE) fishros.org.cn</string>
+   <string>FishROS CAN Debuger(VCODE) fishros.org.cn</string>
   </property>
   <widget class="QWidget" name="centralwidget">
    <layout class="QVBoxLayout" name="verticalLayout">
