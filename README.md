@@ -1,7 +1,12 @@
 # FishROS CAN 调试工具
 
-配套FishROS ROS2 多协议传输控制板（支持CAN/485/IO INPUT/IO OUTPUT）使用。[购买链接](https://m.tb.cn/h.g4sKEcOnkEoye4m?tk=o3wOWCqHrlL)：https://m.tb.cn/h.g4sKEcOnkEoye4m?tk=o3wOWCqHrlL
+配套FishROS ROS2 多协议传输控制板（支持CAN/485/IO INPUT/IO OUTPUT）使用。
 
+配套分析仪&传输控制器 [购买链接](https://m.tb.cn/h.g4sKEcOnkEoye4m?tk=o3wOWCqHrlL)：https://m.tb.cn/h.g4sKEcOnkEoye4m?tk=o3wOWCqHrlL
+
+![](./image/ros2_multi-protocol_board.png)
+
+软件界面
 
 ![](./image/interface.png)
 
