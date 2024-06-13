@@ -56,7 +56,7 @@ class CanFrame():
         self.rtr = rtr # 远程帧
         self.id = parse_frame[3]
         self.len = parse_frame[4]
-        self.data =  ' '.join(format(x, '02x') for x in list(parse_frame[5]))
+        self.data =  ' '.join(format(x, '02x') for x in list(parse_frame[5][:self.len]))
         self.checksum = parse_frame[1]
     
 
