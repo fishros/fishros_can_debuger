@@ -95,14 +95,14 @@ class CanHelper():
         self.event_callback = device_event_callback
 
     def write_frame(self,frame):
-        self.logger(f"[提示]发送帧 ID:{frame.id}")
+        self.logger(f"[提示]发送帧：{frame}")
         try:
             if self.serial:
                 self.serial.write(frame.to_bytes())
-                self.logger(f"[提示]发送帧 ID:{frame.id} 成功!")
+                self.logger(f"[提示]发送帧 {frame} 成功!")
                 return True
         except:
-            self.logger(f"[提示]发送帧 ID:{frame.id} 失败!")
+            self.logger(f"[提示]发送帧 {frame} 失败!")
             pass
         return False
 

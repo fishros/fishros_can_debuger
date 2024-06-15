@@ -144,4 +144,4 @@ class CanSendFrame():
         return packed_data
 
     def __repr__(self):
-        return f"[提示]发送CAN Set Rate Frame: {self.rate}"
+        return f"[提示]发送CAN Set Rate Frame: {self.id} {self.data}"
