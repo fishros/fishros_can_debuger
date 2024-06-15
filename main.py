@@ -294,6 +294,8 @@ class FishCanDebuger:
                     current_rate = int(self.form.commonBoxRateSet.currentText())
                     if current_rate != frame.rate:
                         self.form.commonBoxRateSet.setCurrentIndex(self.rate2index_map[frame.rate])
+                self.form.labelBusErrorCount.setText(str(frame.bus_error_count))
+                self.form.labelBusStatus.setText(str(frame.bus_status))
             else:
                 self.update_frame(frame)
 

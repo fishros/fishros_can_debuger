@@ -69,13 +69,19 @@ class CanFrame():
 
 class CanInfoReportFrame():
     ID = FRAME_CAN_INFO
+    BUS_STATUS = {
+        0:"已停止",
+        1:"运行中",
+        2:"已关闭",
+        3:"已恢复",
+    }
     def __init__(self,frame) -> None:
         # print(len(frame),frame,'\n', ' '.join(format(x, '02x') for x in list(frame)))
         parse_frame = struct.unpack('<BBHIIIIIIIIIIBB', frame)
         self.timestamp = time.time()
         # print(parse_frame)
         self.rate = parse_frame[2]
-        self.bus_status = parse_frame[3]
+        self.bus_status = CanInfoReportFrame.BUS_STATUS[parse_frame[3]]
         self.msgs_to_tx =  parse_frame[4]
         self.msgs_to_rx =  parse_frame[5]
         self.tx_error_counter  = parse_frame[6]
@@ -89,7 +95,7 @@ class CanInfoReportFrame():
         pass
 
     def __repr__(self):
-        return f"[提示]收到CAN INFO Frame: {self.rate} ]"
+        return f"[提示]收到CAN Info rate:{self.rate} bus_status:{self.bus_status}  msgs_to_tx:{self.msgs_to_tx} msgs_to_rx:{self.msgs_to_rx} tx_error_counter:{self.tx_error_counter} rx_error_counter:{self.rx_error_counter} tx_failed_count:{self.tx_failed_count} rx_missed_count:{self.rx_missed_count} rx_overrun_count:{self.rx_overrun_count} arb_lost_count:{self.arb_lost_count} bus_error_count:{self.bus_error_count} ]"
 
 
 class CanSetRateFrame():
@@ -106,8 +112,6 @@ class CanSetRateFrame():
         content_data = content_data.replace(b'\x50',b'\x50\x05').replace(b'\x5a',b'\x50\x0a')
         struct_format = f'<B{len(content_data)}sB'   
         packed_data = struct.pack(struct_format, 0x5A,content_data ,0x5A)  
-
-        # print(len(packed_data),packed_data,'\n', ' '.join(format(x, '02x') for x in list(packed_data)))
 
         return packed_data
 
@@ -133,6 +137,7 @@ class CanSendFrame():
         content_data = content_data.replace(b'\x50',b'\x50\x05').replace(b'\x5a',b'\x50\x0a')
         struct_format = f'<B{len(content_data)}sB'   
         packed_data = struct.pack(struct_format, 0x5A,content_data ,0x5A)  
+
 
         # print(len(packed_data),packed_data,'\n', ' '.join(format(x, '02x') for x in list(packed_data)))
 
