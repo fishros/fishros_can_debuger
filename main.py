@@ -2,6 +2,7 @@ from PyQt6 import uic
 from PyQt6.QtWidgets import QApplication, QTableWidgetItem, QHeaderView, QComboBox, QPushButton, QWidget, QVBoxLayout, QSizePolicy
 from PyQt6.QtGui import QStandardItemModel, QStandardItem
 from PyQt6.QtCore import QTimer, Qt
+from PyQt6.QtGui import QColor
 import time
 import signal
 import sys
@@ -30,11 +31,12 @@ class CustomComboBox(QWidget):
         return self.combo.currentIndex() == 1
 
 class CustomButton(QWidget):
-    def __init__(self, parent=None, form=None, row_index=0, can_helper=None):
+    def __init__(self, can_debug=None, parent=None, form=None, row_index=0, can_helper=None):
         super(CustomButton, self).__init__(parent)
         self.form = form
         self.row_index = row_index
         self.can_helper = can_helper
+        self.can_debug = can_debug
 
         self.layout = QVBoxLayout()
         self.button = QPushButton("发送")
@@ -60,8 +62,7 @@ class CustomButton(QWidget):
         frame = CanSendFrame(id,extd,len,data)
 
         if self.can_helper.write_frame(frame):
-            # print(f'Send success!')
-            pass
+            self.can_debug.update_frame(frame)
         else:
             print('Send error!')
 
@@ -81,6 +82,7 @@ class FishCanDebuger:
         self._timer.setInterval(2)
         self._timer.start()
         self.second_update = False
+        self.update_rate = True
 
         self.initialize_table()
         self.device_helper = DeviceHelper(self.put_log)
@@ -113,8 +115,7 @@ class FishCanDebuger:
         self.form.lineEditFilterID.setDisabled(True)
         self.form.commonBoxMaxFrameCount.setDisabled(True)
 
-        self.rate2index_map = {100: 0, 125: 1, 250: 2, 500: 3, 800: 4, 1000: 5}
-        self.update_rate = False
+        self.rate2index_map = {50:0, 100: 1, 125: 2, 250: 3, 500: 4, 800: 5, 1000: 6}
 
     def checkbox_auto_scoll(self, state):
         self.auto_scoll = self.form.checkBoxAutoScoll.isChecked()
@@ -166,20 +167,21 @@ class FishCanDebuger:
 
     def initialize_table(self):
         self.tableModel = QStandardItemModel()
-        headers = ["时间", "方向", "ID", "帧类型", "长度", "数据"]
+        headers = ["时间", "方向", "ID", "帧类型", "长度", "CANOPEN", "数据"]
         self.tableModel.setHorizontalHeaderLabels(headers)
 
         self.form.tableViewCANFrame.setModel(self.tableModel)
         header = self.form.tableViewCANFrame.horizontalHeader()
         header.setSectionResizeMode(QHeaderView.ResizeMode.Interactive)
-        header.setSectionResizeMode(5, QHeaderView.ResizeMode.Stretch)
+        header.setSectionResizeMode(6, QHeaderView.ResizeMode.Stretch)
 
         self.form.tableViewCANFrame.setColumnWidth(0, 180)
         self.form.tableViewCANFrame.setColumnWidth(1, 60)
-        self.form.tableViewCANFrame.setColumnWidth(2, 100)
-        self.form.tableViewCANFrame.setColumnWidth(3, 80)
+        self.form.tableViewCANFrame.setColumnWidth(2, 90)
+        self.form.tableViewCANFrame.setColumnWidth(3, 60)
         self.form.tableViewCANFrame.setColumnWidth(4, 50)
-        self.form.tableViewCANFrame.setColumnWidth(5, 300)
+        self.form.tableViewCANFrame.setColumnWidth(5, 80)
+        self.form.tableViewCANFrame.setColumnWidth(6, 250)
 
         self.tableSendCanModel = QStandardItemModel()
         headers = ["ID", "帧类型", "长度", "数据", "发送"]
@@ -211,7 +213,7 @@ class FishCanDebuger:
         ])
 
         combo_box = CustomComboBox()
-        send_button = CustomButton(form=self.form, row_index=self.tableSendCanModel.rowCount() - 1, can_helper=self.can_helper)
+        send_button = CustomButton(self, form=self.form, row_index=self.tableSendCanModel.rowCount() - 1, can_helper=self.can_helper)
 
         self.form.tableViewSendCan.setIndexWidget(self.tableSendCanModel.index(self.tableSendCanModel.rowCount() - 1, 1), combo_box)
         self.form.tableViewSendCan.setIndexWidget(self.tableSendCanModel.index(self.tableSendCanModel.rowCount() - 1, 4), send_button)
@@ -260,16 +262,26 @@ class FishCanDebuger:
         can_id_item = QStandardItem(f"{hex(frame.id)}")
         frame_type_item = QStandardItem("标准帧" if frame.extd else "数据帧")
         frame_length_item = QStandardItem(str(frame.len))
-        frame_data_item = QStandardItem(frame.data)
+        frame_data_item = QStandardItem(frame.data_str)
+        frame_canopen_item = QStandardItem(frame.canopen)
 
-        self.tableModel.appendRow([
+        # 设置行背景颜色
+        row_items = [
             timestamp_item,
             direction_item,
             can_id_item,
             frame_type_item,
             frame_length_item,
-            frame_data_item
-        ])
+            frame_canopen_item,
+            frame_data_item,
+        ]
+        # 判断是接收还是发送，设置背景颜色
+        if frame.ID == FRAME_CAN_SEND:
+            color = QColor(220, 255, 220)  # 浅绿色背景 (接收)
+            for item in row_items:
+                item.setBackground(color)
+
+        self.tableModel.appendRow(row_items)
 
         if self.auto_scoll:
             index = self.tableModel.index(self.tableModel.rowCount() - 1, 0)

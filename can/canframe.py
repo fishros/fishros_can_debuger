@@ -43,6 +43,51 @@ def compose_byte(bit_values, composition_pattern):
 
 
 
+
+def get_flag_with_cob_id(cob_id):
+    """
+    根据 COB-ID 返回 CANopen 功能标识。
+
+    :param cob_id: int, CANopen COB-ID
+    :return: str, 功能描述
+    """
+    # NMT (Network Management)
+    if cob_id == 0x000:
+        return 'NMT'
+    # SYNC (Synchronization)
+    elif cob_id == 0x080:
+        return 'SYNC'
+    # TIME (Time Stamp)
+    elif cob_id == 0x100:
+        return 'TIME'
+    # TPDO (Transmit Process Data Object)
+    elif 0x180 <= cob_id <= 0x1FF:
+        return f'TPDO:{cob_id - 0x180}'
+    # RPDO (Receive Process Data Object)
+    elif 0x200 <= cob_id <= 0x27F:
+        return f'RPDO:{cob_id - 0x200}'
+
+    # SDO (Service Data Object) - Request
+    elif 0x600 <= cob_id <= 0x67F:
+        return f'SDOReq:{cob_id - 0x600}'
+
+    # SDO (Service Data Object) - Response
+    elif 0x580 <= cob_id <= 0x5FF:
+        return f'SDORep:{cob_id - 0x580}'
+
+    # EMCY (Emergency)
+    elif 0x080 <= cob_id <= 0x0FF:
+        return f'EMCY:{cob_id - 0x080}'
+
+    # Heartbeat/Node Guarding
+    elif 0x700 <= cob_id <= 0x77F:
+        return f'Heartbeat:{cob_id - 0x700}'
+    # 未知的 COB-ID
+    else:
+        return 'Unknown'
+
+    
+
 import struct  
 
 
@@ -58,7 +103,10 @@ class CanFrame():
         self.len = parse_frame[4]
         self.data =  ' '.join(format(x, '02x') for x in list(parse_frame[5][:self.len]))
         self.checksum = parse_frame[1]
-    
+        self.data_str = self.data 
+        self.canopen = get_flag_with_cob_id(self.id)
+        
+
 
     def to_bytes(self):
         pass
@@ -91,6 +139,7 @@ class CanInfoReportFrame():
         self.rx_overrun_count  = parse_frame[10]
         self.arb_lost_count  = parse_frame[11]
         self.bus_error_count  = parse_frame[12]
+
     def to_bytes(self):
         pass
 
@@ -125,12 +174,19 @@ class CanSendFrame():
     def __init__(self,id,extd,dlc,data) -> None:
         self.id = id
         self.extd = extd
-        self.dlc = dlc
+        self.len = dlc
         self.data = data
+        self.data_str = ' '.join(format(x, '02x') for x in data)
+
+        self.timestamp = time.time()
+        self.rtr = 0
+        self.canopen = get_flag_with_cob_id(self.id)
+
+
 
     def to_bytes(self):
         flag = compose_byte((self.extd,0,0,0,0,0,0,0),"11111111")
-        content_data =  struct.pack('<BBIB8s',FRAME_CAN_SEND,flag,self.id,self.dlc,self.data)  
+        content_data =  struct.pack('<BBIB8s',FRAME_CAN_SEND,flag,self.id,self.len,self.data)  
 
         checksum = sum(content_data) & 0xFF  # 使用按位与操作确保结果是8位
         content_data = struct.pack(f'{len(content_data)}sB',content_data,checksum)
@@ -139,7 +195,6 @@ class CanSendFrame():
         packed_data = struct.pack(struct_format, 0x5A,content_data ,0x5A)  
 
 
-        # print(len(packed_data),packed_data,'\n', ' '.join(format(x, '02x') for x in list(packed_data)))
 
         return packed_data
 
