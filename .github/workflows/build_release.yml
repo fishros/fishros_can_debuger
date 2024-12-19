@@ -27,15 +27,6 @@ jobs:
           name: build-artifacts-linux-${{ github.run_number }}-${{ github.sha }}
           path: dist
 
-      - name: Copy Bin
-        run: mkdir dist-bin && cp $(ls -1 dist/*) dist-bin/fishbot_can_debuger_linux_amd64
-
-      - name: Archive build artifacts bin
-        uses: actions/upload-artifact@v4
-        with:
-          name: build-artifacts-linux-bin-${{ github.run_number }}-${{ github.sha }}
-          path: dist-bin
-
 
   build-windows:
     runs-on: windows-latest
@@ -60,7 +51,7 @@ jobs:
 
   release:
     runs-on: ubuntu-22.04
-    needs: [build-windows]
+    needs: [build-windows,build-linux-amd64]
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
